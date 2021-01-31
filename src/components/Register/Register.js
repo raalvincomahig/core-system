@@ -13,12 +13,17 @@ import {
     Grid,
     Button,
     Checkbox,
-    FormControlLabel
+    FormControlLabel,
+    Snackbar
 }  from "@material-ui/core";
+import MuiAlert from '@material-ui/lab/Alert';
 import axios from 'axios';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
 
+function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 export default function Register(props) {
     const position = [
@@ -53,6 +58,14 @@ export default function Register(props) {
         error_type: 'error',
         error_message: ''
     })
+    const [open, setOpen] = React.useState(false);
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+          return;
+        }
+    
+        setOpen(false);
+    };
 
     const handleChange = (e) => {
         // Check email if valid
@@ -89,19 +102,21 @@ export default function Register(props) {
         }
         
     }
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log(`${process.env.REACT_APP_BASE_URL}:${process.env.REACT_APP_SERVER_PORT}`, user);
         if(user.password === user.password_confirmation) {
-            console.log(' Match');
             setUser({
                 ...user,
                 error: {
                     password: false,
                     password_confirmation: false
-                }
+                },
+                error_message: '',
+                error_type: 'error',
+                error_status: false
             });
+            setOpen(false)
         }
         else {
             setUser({
@@ -109,8 +124,12 @@ export default function Register(props) {
                 error: {
                     password: true,
                     password_confirmation: true
-                }
+                },
+                error_message: 'Passwords did not match',
+                error_type: 'error',
+                error_status: true
             });
+            setOpen(true);
         }
         const checkError = (user.error.position || user.error.company || user.error.first_name || user.error.last_name || user.error.username || user.error.email || user.error.password || user.error.password_confirmation);
         if(!checkError) {
@@ -126,9 +145,17 @@ export default function Register(props) {
                 password_confirmation: user.password_confirmation,
             }).then(profile => {
                 console.log(profile);
-                alert('Registration Complete!');
+                setUser({
+                    ...user,
+                    error_status: true,
+                    error_message: 'Registration successful',
+                    error_type: 'success'
+                    
+                });
+                setOpen(true);
+                // Send Email Verification here
+                // Clear form
             }).catch(err => {
-                
                 const response = err.response.data
                 console.log(response)
                 if(response.success) {
@@ -151,10 +178,11 @@ export default function Register(props) {
                             setUser({
                                 ...user,
                                 error_status: true,
-                                error_message: detail.message
+                                error_message: errorField.toUpperCase() + ' : ' + detail.message
                                 
                             });
                         })
+                        setOpen(true)
                     }
                 }
             })
@@ -333,6 +361,11 @@ export default function Register(props) {
                     
                 </CardActions>
             </Card>
+            <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity={user.error_type}>
+                    {user.error_message}
+                </Alert>
+            </Snackbar>
         </Grid>
     );
 }

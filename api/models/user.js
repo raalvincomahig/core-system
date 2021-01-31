@@ -61,7 +61,8 @@ const User = mongoose.model('User', new mongoose.Schema({
 }));
 
 function validateUser(user) {
-    
+    // Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character
+    const pwPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     const schema = Joi.object({
         position: Joi.string().min(2).max(50).required().valid(...position).messages({
             'string.empty': `Please select a Position`,
@@ -104,12 +105,12 @@ function validateUser(user) {
             'any.required': `Email is a required field`
         }),
          // Minimum eight characters, at least one uppercase letter, one lowercase letter and one number
-        password: Joi.string().pattern(new RegExp("^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$")).min(5).max(255).required().messages({
+        password: Joi.string().regex(RegExp(pwPattern)).min(5).max(255).required().messages({
             'string.base': `Please enter a valid Password`,
             'string.empty': `Please enter Password`,
             'string.min': `Password should have a minimum length of {#limit}`,
             'string.max': `Password should have a maximum length of {#limit}`,
-            "object.regex": "Minimum eight characters, at least one uppercase letter, one lowercase letter and one number",
+            "object.regex": "Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character",
             "string.pattern.base": "Minimum eight characters, at least one uppercase letter, one lowercase letter and one number",
             'any.required': `Password is a required field`
         },

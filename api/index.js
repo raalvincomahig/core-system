@@ -6,12 +6,15 @@ const auth = require('./routes/auth');
 const express = require('express');
 var cors = require('cors');
 const app = express();
+const session = require('express-session');
+const { v4: uuidv4 } = require('uuid');
 const config = require('config');
 
 require('dotenv').config();
 
 const allowedOrigins = [process.env.BaseURL + ':' + process.env.ClientPort];
-app.use(cors({
+app.use(
+  cors({
     origin: function(origin, callback){
       // allow requests with no origin 
       // (like mobile apps or curl requests)
@@ -22,8 +25,27 @@ app.use(cors({
         return callback(new Error(msg), false);
       }
       return callback(null, true);
+    },
+    methods: ['POST', 'PUT', 'GET', 'OPTIONS', 'HEAD'],
+    credentials: true,
+    exposedHeaders: ['set-cookie']
+  }),
+  session({
+    genid: function(req) {
+      const uid = uuidv4();
+      console.log(uid);
+      return uid;
+    },
+    secret: process.env.PrivateKey || 'public',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+      httpOnly: true,
+      originalMaxAge: parseInt(process.env.SESSION_MAX_AGE)
     }
-}));
+  })
+);
+app.set('trust proxy', 1);
 
 if (!config.get('PrivateKey')) {
     console.error('FATAL ERROR: PrivateKey is not defined.');

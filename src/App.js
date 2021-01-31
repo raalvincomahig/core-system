@@ -1,3 +1,8 @@
+import React, {
+  useEffect,
+  useState
+}  from 'react';
+
 import './App.css';
 import {
   Container
@@ -11,7 +16,7 @@ import {
 } from 'react-router-dom';
 import Login from './components/Login/Login';
 import Register from './components/Register/Register';
-
+import Home from './components/Home/Index';
 
 const useStyles = makeStyles((theme) => ({
   loginCard: {
@@ -38,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
   halfInputRight: {
     width: '95%',
     marginBottom: '20px',
-    paddingLeft: '5%'
+    marginRight: '5%'
   },
   formControl: {
     margin: theme.spacing(1),
@@ -47,34 +52,85 @@ const useStyles = makeStyles((theme) => ({
   selectEmpty: {
     marginTop: theme.spacing(2),
   },
+  avatar: {
+    backgroundColor: '#a80000',
+  },
+  spacer_1: {
+    marginBottom: 10,
+    marginTop: 10
+  },
+  upload_input: {
+    display: 'none'
+  }
 }));
 
 function App() {
   const classes = useStyles();
-  return (
-    <div className="App">
-      <Container>
-        <Router>
-          <Switch>
-            <Route exact path='/'></Route>
-            <Route exact path='/login'>
-              <Login classes={classes}/>
-            </Route>
-            <Route exact path='/register'>
-              <Register classes={classes}/>
-            </Route>
-            <Route exact path='/signup'></Route>
-            <Route exact path='/verify'></Route>
-            <Route exact path='/users'></Route>
-            <Route exact path='/user-profile'></Route>
-            <Route path="*">
-              <Redirect to="/" />
-            </Route>
-          </Switch>
-        </Router>
-      </Container>
-    </div>
-  );
+  const [ session, setSession ] = useState({
+    user: null,
+    success: false,
+    message: '',
+    loading: true
+  })
+  
+
+  useEffect(
+    () => {
+      const user = JSON.parse(sessionStorage.getItem('user'));
+      console.log(user)
+      setSession({
+        ...session,
+        user: user,
+        loading: false
+      })
+    }, []);
+  
+  return session.loading ? <>Loading..</>: (
+    (
+      <div className="App">
+        <Container>
+          <Router>
+            <Switch>
+              <Route exact path='/'>
+                { 
+                  session.user ? (
+                    <Home classes={classes} user={session.user}/>
+                  ) : (
+                    <Redirect to="/login" />
+                  )
+                }
+              </Route>
+              <Route exact path='/login'>
+                { 
+                  session.user ? (
+                    <Redirect to="/" />
+                  ) : (
+                    <Login classes={classes}/>
+                  )
+                }
+              </Route>
+              <Route exact path='/register'>
+                { 
+                  session.user ? (
+                    <Redirect to="/" />
+                  ) : (
+                    <Register classes={classes}/>
+                  )
+                }
+              </Route>
+              {/* <Route exact path='/verify'></Route> */}
+              <Route exact path='/users'></Route>
+              <Route exact path='/user-profile'></Route>
+              <Route path="*">
+                <Redirect to="/" />
+              </Route>
+            </Switch>
+          </Router>
+        </Container>
+      </div>
+    )
+  ) ;
+  
 }
 
 export default App;
