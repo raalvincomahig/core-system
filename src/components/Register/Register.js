@@ -181,6 +181,7 @@ export default function Register(props) {
                                 error_message: errorField.toUpperCase() + ' : ' + detail.message
                                 
                             });
+                            return true;
                         })
                         setOpen(true)
                     }
