@@ -104,7 +104,7 @@ export default function Register(props) {
     }
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(`${process.env.REACT_APP_BASE_URL}:${process.env.REACT_APP_SERVER_PORT}`, user);
+        console.log(`${process.env.REACT_API_BASE_URL}`, user);
         if(user.password === user.password_confirmation) {
             setUser({
                 ...user,
@@ -133,7 +133,7 @@ export default function Register(props) {
         }
         const checkError = (user.error.position || user.error.company || user.error.first_name || user.error.last_name || user.error.username || user.error.email || user.error.password || user.error.password_confirmation);
         if(!checkError) {
-            axios.post(`${process.env.REACT_APP_BASE_URL}:${process.env.REACT_APP_SERVER_PORT}/api/users`, {
+            axios.post(`${process.env.REACT_API_BASE_URL}/api/users`, {
                 position: user.position,
                 company: user.company,
                 username: user.username,

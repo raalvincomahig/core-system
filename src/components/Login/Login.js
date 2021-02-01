@@ -24,7 +24,7 @@ function Alert(props) {
 }
 
 export default function Login(props) {
-    const api_url = `${process.env.REACT_APP_BASE_URL}:${process.env.REACT_APP_SERVER_PORT}`;
+    const api_url = `${process.env.REACT_API_BASE_URL}`;
     const { classes } = props;
     const [user, setUser] = useState({
         username: '',

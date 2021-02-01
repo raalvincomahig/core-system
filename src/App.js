@@ -72,12 +72,10 @@ function App() {
     message: '',
     loading: true
   })
-  
 
   useEffect(
     () => {
       const user = JSON.parse(sessionStorage.getItem('user'));
-      console.log(user)
       setSession({
         ...session,
         user: user,
